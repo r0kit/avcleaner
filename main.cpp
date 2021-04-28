@@ -133,7 +133,7 @@ namespace AVObfuscator {
 
             clang::SourceManager &SM = ASTRewriter.getSourceMgr();
 
-            std::string FileName = SM.getFileEntryForID(SM.getMainFileID())->getName();
+            llvm::StringRef FileName = SM.getFileEntryForID(SM.getMainFileID())->getName();
             llvm::errs() << "** EndSourceFileAction for: " << FileName << "\n";
 
             // Now emit the rewritten buffer.
@@ -154,9 +154,9 @@ namespace AVObfuscator {
             std::ofstream fo;
 
             if (ClSetup::IsEditEnabled) {
-                fo.open(FileName);
+                fo.open(FileName.str());
             } else {
-                fo.open(FileName + ".patch");
+                fo.open(FileName.str() + ".patch");
             }
 
             if (fo.is_open())

@@ -27,7 +27,7 @@ std::string ApiMatchHandler::getFunctionIdentifier(const CallExpr *CallExpressio
         return nullptr;
     }
 
-    return II->getName();
+    return II->getName().str();
 }
 
 bool ApiMatchHandler::replaceIdentifier(const CallExpr *CallExpression, const std::string &ApiName,
@@ -96,7 +96,7 @@ ApiMatchHandler::findInjectionSpot(clang::ASTContext *const Context, clang::ast_
     if (Iterations > Globs::CLIMB_PARENTS_MAX_ITER)
         throw std::runtime_error("Reached max iterations when trying to find a function declaration");
 
-    ASTContext::DynTypedNodeList parents = Context->getParents(Literal);;
+    clang::DynTypedNodeList parents = Context->getParents(Literal);;
 
     if (Iterations > 0) {
         parents = Context->getParents(Parent);

@@ -30,7 +30,7 @@ MatchHandler::getNodeParents(const StringLiteral &NodeString, clang::ast_type_tr
         return CurrentParents;
     }
 
-    ASTContext::DynTypedNodeList parents = Context->getParents(NodeString);
+    clang::DynTypedNodeList parents = Context->getParents(NodeString);
 
     if (Iterations > 0) {
         parents = Context->getParents(Node);
@@ -45,7 +45,7 @@ MatchHandler::getNodeParents(const StringLiteral &NodeString, clang::ast_type_tr
             return getNodeParents(NodeString, parent, Context, CurrentParents, ++Iterations);
         }
 
-        CurrentParents.push_back(ParentNodeKind);
+        CurrentParents.push_back(ParentNodeKind.str());
         return getNodeParents(NodeString, parent, Context, CurrentParents, ++Iterations);
     }
 
@@ -55,7 +55,7 @@ MatchHandler::getNodeParents(const StringLiteral &NodeString, clang::ast_type_tr
 std::string
 MatchHandler::findStringType(const StringLiteral &NodeString, clang::ASTContext *const pContext) {
 
-    ASTContext::DynTypedNodeList parents = pContext->getParents(NodeString);;
+    clang::DynTypedNodeList parents = pContext->getParents(NodeString);;
     std::string StringType;
     for (const auto &parent : parents) {
 
@@ -77,7 +77,7 @@ bool
 MatchHandler::climbParentsIgnoreCast(const StringLiteral &NodeString, clang::ast_type_traits::DynTypedNode node,
                                      clang::ASTContext *const pContext, uint64_t iterations, std::string StringType) {
 
-    ASTContext::DynTypedNodeList parents = pContext->getParents(NodeString);;
+    clang::DynTypedNodeList parents = pContext->getParents(NodeString);;
 
     if (iterations > 0) {
         parents = pContext->getParents(node);
@@ -225,7 +225,7 @@ void MatchHandler::handleInitListExpr(const clang::StringLiteral *pLiteral, clan
 void MatchHandler::handleVarDeclExpr(const clang::StringLiteral *pLiteral, clang::ASTContext *const pContext,
                                       const clang::ast_type_traits::DynTypedNode node, std::string StringType) {
 
-    auto Identifier = node.get<clang::VarDecl>()->getIdentifier()->getName();
+    auto Identifier = node.get<clang::VarDecl>()->getIdentifier()->getName().str();
     auto TypeLoc =  node.get<clang::VarDecl>()->getTypeSourceInfo()->getTypeLoc();
     auto Type = TypeLoc.getType().getAsString();
     auto Loc = TypeLoc.getSourceRange();
@@ -314,7 +314,7 @@ MatchHandler::findInjectionSpot(clang::ASTContext *const Context, clang::ast_typ
     if (Iterations > Globs::CLIMB_PARENTS_MAX_ITER)
         throw std::runtime_error("Reached max iterations when trying to find a function declaration");
 
-    ASTContext::DynTypedNodeList parents = Context->getParents(Literal);;
+    clang::DynTypedNodeList parents = Context->getParents(Literal);;
 
     if (Iterations > 0) {
         parents = Context->getParents(Parent);
@@ -355,7 +355,7 @@ bool MatchHandler::isBlacklistedFunction(const CallExpr *FunctionCall) {
         return true;
     }
 
-    std::string ApiName = II->getName();
+    std::string ApiName = II->getName().str();
 
     return ApiName.find("dprintf") != std::string::npos;
 }
